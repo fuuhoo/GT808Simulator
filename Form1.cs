@@ -14,6 +14,9 @@ using System.Windows.Forms;
 using Gps.Plugin.Common.Helpers;
 //using MySql.Data.MySqlClient;
 using System.Data.SQLite;
+using System.Threading.Tasks;
+using Microsoft.VisualBasic;
+using System.Xml;
 
 namespace GT808Simulator
 {
@@ -31,6 +34,10 @@ namespace GT808Simulator
                    //private double initLon = 119.370384;
         private LatlonBuilder latlonBuilder;
         private int messageID;
+
+        private int loopInterval = 3;
+        private Task looptask;
+        private bool loopSendFlag = false;
         //private string authCodeString = "";
         public Form1()
         {
@@ -40,10 +47,12 @@ namespace GT808Simulator
             InitializeComponent();
 
             string line = ConfigurationManager.AppSettings["remoteServerPort"];
+
             int pos = line.IndexOf(':');
             ip = line.Substring(0, pos);
             string strPort = line.Substring(pos + 1);
             int.TryParse(strPort, out port);
+            sendIntervalTxt.Text = loopInterval.ToString();
             //double minLat = 31.802893;
             //double maxLat = 39.300299;
             //double minLon = 104.941406;
@@ -77,8 +86,10 @@ namespace GT808Simulator
                 if (tcp.Connected)
                 {
                     btnConnect.Enabled = false;
+                    serverAddr.Enabled = false;
                     btnClose.Enabled = true;
                     btnSend.Enabled = true;
+                    btnSendLoop.Enabled = true;
                     toolStripStatusLabel1.Text = "已连接：" + this.ip + ":" + this.port;
                     toolStripStatusLabel1.ForeColor = Color.Green;
                     MessageBox.Show("成功连接到服务器：" + this.ip + ":" + this.port, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -117,8 +128,10 @@ namespace GT808Simulator
                         tcp.Shutdown(SocketShutdown.Both);
                         tcp.Close();
                         btnConnect.Enabled = true;
+                        serverAddr.Enabled = true;
                         btnClose.Enabled = false;
                         btnSend.Enabled = false;
+                        btnSendLoop.Enabled = false;
                         toolStripStatusLabel1.Text = "未连接";
                         toolStripStatusLabel1.ForeColor = Color.Red;
                         MessageBox.Show("成功断开服务器：" + this.ip + ":" + this.port, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -197,6 +210,8 @@ namespace GT808Simulator
             if(!tcp.Connected)
             {
                 btnConnect.Enabled = true;
+                serverAddr.Enabled = true;
+
                 btnClose.Enabled = false;
                 MessageBox.Show("请先连接服务器", "提示",MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -484,8 +499,12 @@ namespace GT808Simulator
             catch (Exception ex)
             {
                 btnConnect.Enabled = true;
+                serverAddr.Enabled = true;
+
                 btnClose.Enabled = false;
                 btnSend.Enabled = false;
+                btnSendLoop.Enabled = false;
+
                 toolStripStatusLabel1.Text = "未连接";
                 toolStripStatusLabel1.ForeColor = Color.Red;
                 log.Error(ex.Message, ex);
@@ -633,6 +652,162 @@ namespace GT808Simulator
             }
         }
         #endregion
+
+        private void btnSendLoop_Click(object sender, EventArgs e)
+        {
+            if (!tcp.Connected)
+            {
+                btnConnect.Enabled = true;
+                serverAddr.Enabled = true;
+
+                btnClose.Enabled = false;
+                MessageBox.Show("请先连接服务器", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (this.messageID == 0)
+            {
+                MessageBox.Show("请在左侧选择正确的指令", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if ((int)this.messageID != (int)MessageIds.PositionReport) {
+
+                MessageBox.Show("循环发送只支持位置汇报", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+
+            
+
+
+
+            if (btnSendLoop.Text == "定时发送")
+            {
+
+                try
+                {
+                    loopSendFlag = true;
+                    looptask = new Task(() =>
+                    {
+
+                        while (loopSendFlag)
+                        {
+                            try
+                            {
+                                this.Invoke(new Action(() =>
+                                {
+                                    SendPosition();
+                                }));
+                               
+                            }
+                            catch (Exception eex) {
+                                MessageBox.Show("数据发送出错", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                                Console.WriteLine(eex);
+                                return;
+                          
+                            }
+
+                            Thread.Sleep(1000 * loopInterval);
+                        }
+                    });
+
+                    looptask.Start();
+                }
+                catch (Exception ex) {
+                    MessageBox.Show("数据发送出错", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+
+                }
+
+                btnSendLoop.Text = "停止";
+
+            }
+            else {
+
+                loopSendFlag = false;
+
+                btnSendLoop.Text = "定时发送";
+            }
+        }
+
+        private void sendIntervalTxt_TextChanged(object sender, EventArgs e)
+        {
+
+
+            try
+            {
+
+                if(sendIntervalTxt.Text!= ""){
+
+                    loopInterval = Convert.ToInt32(sendIntervalTxt.Text);
+                }
+            }
+            catch {
+
+                MessageBox.Show("仅支持数字", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void sendIntervalTxt_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if ((e.KeyChar < 48 || e.KeyChar > 57) && e.KeyChar != 8)
+                e.Handled = true;
+
+        }
+
+        private void serverAddr_Click(object sender, EventArgs e)
+        {
+
+            string line = ConfigurationManager.AppSettings["remoteServerPort"];
+
+            string remoteAddr = Interaction.InputBox("设置服务器地址", "服务器地址", line, -1, -1);
+
+            if ("" == remoteAddr) {
+                return;
+            }
+
+            try
+            {
+
+                int pos = remoteAddr.IndexOf(':');
+                ip = remoteAddr.Substring(0, pos);
+                string strPort = remoteAddr.Substring(pos + 1);
+                int.TryParse(strPort, out port);
+                ConfigurationManager.AppSettings.Set("remoteServerPort", remoteAddr);
+                SetValue("remoteServerPort", remoteAddr);
+
+            }
+            catch (Exception ep) {
+                MessageBox.Show("服务器格式错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+
+        }
+
+        public static void SetValue(string AppKey, string AppValue)
+        {
+            XmlDocument xDoc = new XmlDocument();
+            //获取可执行文件的路径和名称
+            xDoc.Load(System.Windows.Forms.Application.ExecutablePath + ".config");
+
+            XmlNode xNode;
+            XmlElement xElem1;
+            XmlElement xElem2;
+            xNode = xDoc.SelectSingleNode("//appSettings");
+
+            xElem1 = (XmlElement)xNode.SelectSingleNode("//add[@key='" + AppKey + "']");
+            if (xElem1 != null) xElem1.SetAttribute("value", AppValue);
+            else
+            {
+                xElem2 = xDoc.CreateElement("add");
+                xElem2.SetAttribute("key", AppKey);
+                xElem2.SetAttribute("value", AppValue);
+                xNode.AppendChild(xElem2);
+            }
+            xDoc.Save(System.Windows.Forms.Application.ExecutablePath + ".config");
+        }
+
     }
 
     /// <summary>

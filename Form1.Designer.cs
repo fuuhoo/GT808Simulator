@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -41,6 +41,10 @@
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.sendIntervalTxt = new System.Windows.Forms.TextBox();
+            this.btnSendLoop = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.btnSend = new System.Windows.Forms.Button();
@@ -133,6 +137,7 @@
             this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.serverAddr = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -292,6 +297,10 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.label15);
+            this.groupBox5.Controls.Add(this.label14);
+            this.groupBox5.Controls.Add(this.sendIntervalTxt);
+            this.groupBox5.Controls.Add(this.btnSendLoop);
             this.groupBox5.Controls.Add(this.btnClose);
             this.groupBox5.Controls.Add(this.button1);
             this.groupBox5.Controls.Add(this.btnSend);
@@ -303,6 +312,45 @@
             this.groupBox5.TabIndex = 6;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "操作";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(156, 146);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(14, 17);
+            this.label15.TabIndex = 10;
+            this.label15.Text = "s";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(98, 148);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(32, 17);
+            this.label14.TabIndex = 9;
+            this.label14.Text = "间隔";
+            // 
+            // sendIntervalTxt
+            // 
+            this.sendIntervalTxt.Location = new System.Drawing.Point(133, 144);
+            this.sendIntervalTxt.Name = "sendIntervalTxt";
+            this.sendIntervalTxt.Size = new System.Drawing.Size(21, 23);
+            this.sendIntervalTxt.TabIndex = 8;
+            this.sendIntervalTxt.Text = "5";
+            this.sendIntervalTxt.TextChanged += new System.EventHandler(this.sendIntervalTxt_TextChanged);
+            this.sendIntervalTxt.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.sendIntervalTxt_KeyPress);
+            // 
+            // btnSendLoop
+            // 
+            this.btnSendLoop.Enabled = false;
+            this.btnSendLoop.Location = new System.Drawing.Point(6, 140);
+            this.btnSendLoop.Name = "btnSendLoop";
+            this.btnSendLoop.Size = new System.Drawing.Size(89, 33);
+            this.btnSendLoop.TabIndex = 7;
+            this.btnSendLoop.Text = "定时发送";
+            this.btnSendLoop.UseVisualStyleBackColor = true;
+            this.btnSendLoop.Click += new System.EventHandler(this.btnSendLoop_Click);
             // 
             // btnClose
             // 
@@ -318,18 +366,19 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(103, 100);
+            this.button1.Location = new System.Drawing.Point(120, 74);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(87, 33);
+            this.button1.Size = new System.Drawing.Size(71, 42);
             this.button1.TabIndex = 3;
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // btnSend
             // 
             this.btnSend.Enabled = false;
-            this.btnSend.Location = new System.Drawing.Point(8, 140);
+            this.btnSend.Location = new System.Drawing.Point(8, 100);
             this.btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(87, 33);
@@ -1190,10 +1239,10 @@
             // 
             // Column5
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Red;
-            this.Column5.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Red;
+            this.Column5.DefaultCellStyle = dataGridViewCellStyle2;
             this.Column5.HeaderText = "";
             this.Column5.Name = "Column5";
             this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -1278,20 +1327,22 @@
             // 
             // 设置ToolStripMenuItem1
             // 
+            this.设置ToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.serverAddr});
             this.设置ToolStripMenuItem1.Name = "设置ToolStripMenuItem1";
-            this.设置ToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
+            this.设置ToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.设置ToolStripMenuItem1.Text = "设置";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(142, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // 退出ToolStripMenuItem
             // 
             this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
             this.退出ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.退出ToolStripMenuItem.Text = "退出";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
@@ -1332,6 +1383,13 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 30000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // serverAddr
+            // 
+            this.serverAddr.Name = "serverAddr";
+            this.serverAddr.Size = new System.Drawing.Size(180, 22);
+            this.serverAddr.Text = "服务器地址";
+            this.serverAddr.Click += new System.EventHandler(this.serverAddr_Click);
             // 
             // Form1
             // 
@@ -1491,6 +1549,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.Button btnSendLoop;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox sendIntervalTxt;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.ToolStripMenuItem serverAddr;
     }
 }
 
